@@ -1,129 +1,206 @@
 <!DOCTYPE html>
-<html lang="ja" style="background:#080608">
+<html lang="ja" style="background:#0a0c0e">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Figure Architect</title>
+<title>Figure Architect — Character & Pose</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400&display=swap');
   :root{
-    --bg:#080608;--panel:#100d10;--border:#201820;--border2:#302830;
-    --text:#d8d0c8;--muted:#6a5a50;--dim:#201810;
-    --accent:#c084fc;--accent2:#fda4af;--accent3:#86efac;
-    --mono:'DM Mono',monospace;--serif:'DM Serif Display',serif;
+    --bg:#0a0c0e;--panel:#10141a;--border:#1e2430;--border2:#2e3848;
+    --text:#d0ccd8;--muted:#5a6070;--dim:#202830;
+    --accent:#c084fc;--mono:'DM Mono',monospace;--serif:'DM Serif Display',serif;
   }
   *{box-sizing:border-box;margin:0;padding:0}
-  body{background:var(--bg);color:var(--text);font-family:var(--mono);min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:48px 20px 60px}
-  header{text-align:center;margin-bottom:36px}
+  html{background:#0a0c0e}
+  body{background:var(--bg);color:var(--text);font-family:var(--mono);min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:40px 20px 60px}
+  
+  header{text-align:center;margin-bottom:32px}
   .eyebrow{font-size:10px;letter-spacing:.4em;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
-  h1{font-family:var(--serif);font-style:italic;font-size:clamp(26px,5vw,42px);color:#fff;font-weight:400;line-height:1.1;margin-bottom:4px}
+  h1{font-family:var(--serif);font-style:italic;font-size:clamp(28px,5vw,46px);color:#fff;font-weight:400;line-height:1.1;margin-bottom:4px}
   h1 span{color:var(--accent)}
   .subtitle{font-size:11px;color:var(--muted);margin-top:6px;letter-spacing:.15em}
   .counter{font-size:10px;color:var(--dim);margin-top:8px;letter-spacing:.2em}
-  .card{width:100%;max-width:560px;background:var(--panel);border:1px solid var(--border);padding:32px;margin-bottom:20px}
-  label{display:block;margin:16px 0 6px;font-size:11px;letter-spacing:.1em;color:var(--muted)}
-  select{width:100%;padding:12px;background:#1a1a1a;color:#eee;border:1px solid #333;border-radius:8px}
-  button{width:100%;max-width:560px;background:var(--accent);color:#000;font-weight:600;padding:16px;font-size:11px;letter-spacing:.35em;text-transform:uppercase;cursor:pointer;margin:20px 0}
-  #result{margin-top:30px;padding:20px;background:#111;border-radius:12px;display:none}
+
+  .selector-group{width:100%;max-width:680px;margin-bottom:12px}
+  .selector-label{font-size:9px;letter-spacing:.25em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+  .selector{display:flex;gap:8px;width:100%}
+  .selector-btn{flex:1;padding:11px 0;background:transparent;border:1px solid var(--border);color:var(--muted);font-family:var(--mono);font-size:10px;letter-spacing:.15em;text-transform:uppercase;cursor:pointer;transition:all .2s}
+  .selector-btn:hover{border-color:var(--border2);color:var(--text)}
+  .selector-btn.active{border-color:var(--accent);color:var(--accent);background:#16101a}
+
+  .card{width:100%;max-width:680px;background:var(--panel);border:1px solid var(--border);padding:32px;margin-bottom:20px}
+  .fields{display:flex;flex-direction:column;gap:0}
+  .field-row{display:grid;grid-template-columns:110px 1fr auto;gap:12px;align-items:start;padding:12px 0;border-bottom:1px solid var(--border)}
+  .field-row:last-child{border-bottom:none}
+  .field-label{font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);padding-top:4px}
+  .field-value{font-family:var(--serif);font-style:italic;font-size:16px;line-height:1.4;color:#f1ecf7}
+  
+  .reroll-btn{background:transparent;border:none;color:var(--muted);font-size:13px;cursor:pointer;padding:2px 6px;line-height:1;transition:color .15s;flex-shrink:0}
+  .reroll-btn:hover{color:var(--accent);transform:rotate(-15deg)}
+
+  .divider{border:none;border-top:1px solid var(--border);margin:20px 0}
+  .prompt-label{font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+  .prompt-textarea{width:100%;background:#080a0c;border:1px solid var(--border2);color:var(--muted);font-family:var(--mono);font-size:11px;line-height:1.9;padding:12px;resize:vertical;min-height:100px;margin-bottom:14px;word-break:break-word;outline:none}
+  .prompt-textarea:focus{border-color:var(--accent)}
+
+  .copy-btn{background:transparent;border:1px solid var(--border2);color:var(--muted);padding:8px 20px;font-size:10px;letter-spacing:.2em;text-transform:uppercase;cursor:pointer;font-family:var(--mono);transition:all .2s}
+  .copy-btn:hover{border-color:var(--accent);color:var(--accent)}
+  .copy-btn.copied{border-color:#86efac;color:#86efac}
+
+  .generate-btn{width:100%;max-width:680px;background:var(--accent);color:#000;font-weight:700;border:none;padding:20px;font-size:12px;letter-spacing:.4em;text-transform:uppercase;cursor:pointer;font-family:var(--mono);transition:all .2s;margin-bottom:12px}
+  .generate-btn:hover{filter:brightness(1.1);transform:translateY(-1px)}
+  
+  footer{margin-top:20px;font-size:9px;color:var(--dim);letter-spacing:.2em;text-align:center}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+  .animate-in{animation:fadeIn .3s ease forwards}
 </style>
 </head>
 <body>
 
 <header>
-  <div class="eyebrow">Character & Pose Generator</div>
+  <div class="eyebrow">Character & Pose Studio</div>
   <h1>Figure <span>Architect</span></h1>
   <div class="subtitle">Pose · Gesture · Expression · Lighting</div>
-  <div class="counter" id="counter">— generated</div>
+  <div class="counter" id="count">0 generated</div>
 </header>
 
-<div class="card">
-  <label>Framing（構図）</label>
-  <select id="framing">
-    <option value="">完全ランダム</option>
-    <option value="full">全身ショット</option>
-    <option value="upper">上半身</option>
-    <option value="bust">バストアップ</option>
-    <option value="close">顔クローズアップ</option>
-  </select>
+<div class="selector-group">
+  <div class="selector-label">Framing</div>
+  <div class="selector" id="framingSelector">
+    <button class="selector-btn active" data-frame="random">Random</button>
+    <button class="selector-btn" data-frame="full">Full Body</button>
+    <button class="selector-btn" data-frame="upper">Upper Body</button>
+    <button class="selector-btn" data-frame="bust">Bust Up</button>
+    <button class="selector-btn" data-frame="close">Close-up</button>
+  </div>
 </div>
 
-<button onclick="generate()">GENERATE FIGURE</button>
+<div class="card">
+  <div id="displayFields" class="fields animate-in">
+    </div>
+  
+  <hr class="divider">
+  <div class="prompt-label">AI Prompt</div>
+  <textarea class="prompt-textarea" id="prompt" readonly></textarea>
+  <button class="copy-btn" id="copyBtn">Copy Prompt</button>
+</div>
 
-<div id="result"></div>
+<button class="generate-btn" id="generateBtn">GENERATE FIGURE</button>
+
+<footer>Figure Architect · v2.0 · Standardized Edition</footer>
 
 <script>
-let generated = 0;
-const pick = arr => arr[Math.floor(Math.random() * arr.length)];
+// --- DATA (Minified for brevity) ---
+const BODY_POSES = ["standing naturally with weight on one leg","standing tall with shoulders back, confident","standing with hands in pockets, relaxed","standing with arms crossed loosely","standing with one hand on hip","standing with legs crossed at ankles","standing in contrapposto pose, classical","standing with slight lean to one side","standing with arms open wide, welcoming","standing with hands clasped behind back","standing with hands clasped in front","standing with one hand touching neck","standing with both hands on hips, power pose","standing with arms folded across chest","standing with weight shifted, hip popped","standing with one foot slightly forward","standing with hands in jacket pockets","standing with thumbs hooked in belt loops","standing with arms at sides, neutral","standing with one hand raised to hair","standing with hand on chin, thinking","standing with arms akimbo, elbows out","standing with slight twist at waist","standing with shoulders shrugged","standing with hands behind head, stretching","standing with one arm across body holding elbow","standing with hand resting on collarbone","standing with fingers interlaced behind neck","standing with arms hanging loose, natural","standing with hand shielding eyes from sun","standing with hand on heart, emotional","standing with arms crossed, one hand on chin","standing with weight on both feet evenly","standing with slight knee bend, casual","standing with hand adjusting sleeve","standing with hand touching ear","standing with arms slightly away from body","standing with one shoulder raised","standing with hands in back pockets","standing with hand on stomach","standing with arms crossed high on chest","standing with hand gesturing while talking","standing with fingers touching lips","standing with hand on opposite shoulder","standing with arms wrapped around self","standing with one hand on waist, other relaxed","standing with slight forward lean, engaged","standing with hand brushing hair back","standing with arms behind back, formal","standing with hand holding bag strap","standing with weight on heels, leaning back","standing with toes pointed slightly out","standing with hand resting on hip bone","standing with arms crossed, head tilted","standing with hand touching cheek","standing with fingers playing with necklace","standing with one hand in pocket, other gesturing","standing with arms loose, slight sway","standing with hand on forehead, looking out","standing with shoulders relaxed, natural slouch","walking gracefully toward camera","walking away from camera, looking back","mid-stride dynamic walking pose","walking with confident stride","walking with hands in pockets","walking while looking at phone","walking with bag swinging","walking with coat flowing behind","walking with one hand in hair","walking with purposeful stride","strolling casually, relaxed pace","walking with head turned to side","walking with arms swinging naturally","walking with slight skip in step","walking with hands clasped behind back","power walking, determined","walking with umbrella","walking with coffee cup in hand","walking while adjusting bag","walking with head down, thoughtful","walking with looking up at buildings","walking with hand trailing along wall","walking with slight turn of body","walking with long stride","walking with short quick steps","walking with hands gesturing while talking","walking with head over shoulder","walking with one hand on hip","walking with both hands in coat pockets","walking with scarf blowing in wind","walking with hands in pockets, shoulders hunched against cold","walking with confident runway stride","walking with casual swagger","walking with careful steps","walking with energetic bounce","walking while laughing","walking with hand shielding eyes","walking with bag over shoulder","walking with hands free, arms swinging","sitting on steps looking sideways","sitting on the floor with knees up","sitting on a chair backwards","sitting with legs crossed elegantly","sitting on a low wall or ledge","sitting with one leg up, knee to chest","sitting on edge of chair, leaning forward","sitting back relaxed in chair","sitting with legs crossed at ankles","sitting with legs stretched out in front","sitting cross-legged on floor","sitting with one leg dangling","sitting sideways on chair","sitting with elbows on knees","sitting with hands clasped between knees","sitting with arms resting on chair back","sitting with legs tucked to side","sitting with one arm draped over chair","sitting with hands in lap, composed","sitting with leaning on one armrest","sitting with legs crossed, foot bouncing","sitting with knees together, feet apart","sitting with sprawled relaxed pose","sitting with upright posture, formal","sitting with slouched casual pose","sitting on stairs, elbows on knees","sitting on curb, hands in pockets","sitting on bench, leaning back","sitting on floor, legs to one side","sitting with chin resting on hand","sitting with arms crossed, leaning back","sitting with one knee up, arm resting on it","sitting with both feet flat on ground","sitting with legs extended, ankles crossed","sitting with hands behind head, relaxed","sitting with leaning forward, engaged","sitting with profile view, looking away","sitting with three-quarter turn","sitting with hands holding cup","sitting with legs crossed, leaning to side","sitting on high stool, legs dangling","sitting with one leg crossed over other","sitting with hands on thighs","sitting with arms open along back of seat","sitting with head tilted, thoughtful","sitting with legs tucked under","sitting with casual manspread","sitting with knees pulled to chest","sitting with side saddle pose","sitting with one arm on knee, other relaxed","crouching down gently","crouching with hands on knees","squatting playfully","squatting with elbows on knees","crouching low, balanced on balls of feet","kneeling on one knee","kneeling on both knees","kneeling with one knee up","crouching with arms resting on knees","sitting on heels, Japanese style","crouching with hands clasped","deep squat, street style","crouching while tying shoe","crouching with hand on ground for balance","kneeling with hands in lap","crouching with back against wall","squatting with arms crossed","crouching with looking up","kneeling with torso upright","crouching with one hand on knee","on all fours, playful","crouching with elbows resting on thighs","kneeling with hands on thighs","low crouch, ready to move","squatting with heels down","crouching with arms wrapped around knees","kneeling with side profile","crouching with head tilted","squatting with hands in pockets","crouching with one knee on ground","kneeling with hands clasped in front","crouching with back straight","low squat, arms hanging loose","crouching with looking over shoulder","kneeling with weight shifted","crouching with hands on ground","squatting with casual lean","crouching with arms resting on one knee","kneeling with elegant posture","crouching with playful expression","lying on side propped on elbow","reclining on elbow","lying on back, arms behind head","lying on stomach, chin on hands","reclining against wall, legs stretched out","lying on side, knees bent","reclining in chair, legs up","lying on back looking up","reclining with one arm behind head","lying on stomach, propped on elbows","reclining sideways on couch","lying with legs crossed at ankles","reclining with hands behind head","lying on side, head resting on hand","reclining with knees bent, feet flat","lying stretched out, relaxed","reclining with one knee up","lying on back, arms at sides","reclining against something, casual","lying with head tilted back","reclining with legs dangling","lying curled on side","reclining with arms crossed behind head","lying with one arm extended","reclining with relaxed sprawl","lying on stomach, legs bent up","reclining with head resting on arm","lying with hands on stomach","reclining with peaceful pose","lying with legs stretched, toes pointed","jumping in mid-air","running dynamically","dancing freely","spinning around","balancing on one foot","stretching arms upward","twirling with scarf flowing","jumping with arms raised","running with hair flowing","dancing with arms out","spinning with dress flaring","leaping gracefully","jumping with knees tucked","running toward camera","dancing with one leg lifted","spinning with arms extended","jumping with joyful expression","running with arms pumping","dancing with hip movement","leaping with elegant form","jumping with legs apart","spinning slowly, graceful","running with determined look","dancing with free movement","jumping with arms wide","balancing in tree pose yoga","stretching to side, reaching","twisting torso, dynamic","lunging forward, athletic","reaching upward, stretching"];
+const HAND_GESTURES = ["relaxed hands at sides","fists clenched","open palms forward","peace sign","thumbs up","finger gun","hand on chin thinking","adjusting glasses","holding invisible object","counting on fingers","interlaced fingers","prayer hands","heart hands","okay sign","crossed fingers","pointing index","waving","shaka sign","rock on horns","touching cheek","covering mouth","hands on hips","arms crossed","one hand in pocket","both hands in pockets","gripping wrist","cracking knuckles","thumbs in belt loops","holding collar","adjusting sleeve","touching ear","scratching head","hand over heart","salute","stop palm","beckoning finger","clapping","fidgeting with ring","holding chin","framing face","hands folded neatly","gripping shoulders","touching lips","Victory V","jazz hands","finger to temple","wrist check watch","loose fists ready"];
+const FACIAL_EXPRESSIONS = ["neutral expression","slight smile","warm genuine smile","broad grin","smirking","laughing","serious focused","determined glare","soft gaze","smoldering look","surprised raised brows","shocked open mouth","confused furrowed brow","worried frown","pensive thoughtful","bored half-lidded","annoyed side-eye","angry scowl","disgusted sneer","sad downcast eyes","crying teary","sleepy tired","yawning","playful wink","flirty half-smile","mischievous grin","confident smirk","embarrassed blush","smug superiority","calm serene","curious head tilt","intrigued raised eyebrow","proud chin up","shy looking away","fearful wide eyes","pouting lips","smirking with teeth","stoic poker face"];
+const LIGHTING = ["soft studio lighting","dramatic Rembrandt lighting","high key bright white","low key moody shadows","backlit rim light","golden hour sunlight","cinematic three-point lighting","neon colored rim lights","cool blue moonlight","warm candlelight glow","overcast softbox diffused","harsh midday sun","volumetric god rays","top-down spotlight","underlighting horror","colorful RGB split lighting","window light natural","studio key light left"];
+const FRAMING = { full: "full body shot", upper: "upper body shot, waist up", bust: "bust up portrait, chest up", close: "close-up portrait, face focus" };
 
-const FRAMING = {
-  "full": "full body shot, standing naturally",
-  "upper": "upper body shot, from waist up",
-  "bust": "medium close-up, bust shot",
-  "close": "extreme close-up on face and expression"
+// --- LOGIC ---
+let selectedFrameKey = 'random';
+let current = {};
+let count = parseInt(localStorage.getItem('fa_count') || '0', 10);
+
+const $ = id => document.getElementById(id);
+const rand = arr => arr[Math.floor(Math.random()*arr.length)];
+
+function updateCount() {
+  $('count').textContent = `${count} generated`;
+  localStorage.setItem('fa_count', count);
+}
+
+function setActiveFrame(key) {
+  selectedFrameKey = key;
+  document.querySelectorAll('#framingSelector .selector-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.frame === key);
+  });
+}
+
+function buildPrompt() {
+  return `${current.framing}, ${current.pose}, ${current.gesture}, ${current.expression}, ${current.lighting}`;
+}
+
+function renderFields() {
+  const fields = [
+    { label: "Framing", value: current.framing, key: "framing", color: "#67e8f9" },
+    { label: "Pose", value: current.pose, key: "pose", color: "#c084fc" },
+    { label: "Gesture", value: current.gesture, key: "gesture", color: "#f9a8d4" },
+    { label: "Expression", value: current.expression, key: "expression", color: "#86efac" },
+    { label: "Lighting", value: current.lighting, key: "lighting", color: "#fcd34d" }
+  ];
+
+  $('displayFields').innerHTML = fields.map(f => `
+    <div class="field-row animate-in">
+      <div class="field-label">${f.label}</div>
+      <div class="field-value" style="color:${f.color}">${f.value}</div>
+      <button class="reroll-btn" onclick="reroll('${f.key}')">🔄</button>
+    </div>
+  `).join('');
+  $('prompt').value = buildPrompt();
+}
+
+function generateAll() {
+  const frameKey = selectedFrameKey === 'random' ? rand(Object.keys(FRAMING)) : selectedFrameKey;
+  current = {
+    framing: FRAMING[frameKey],
+    pose: rand(BODY_POSES),
+    gesture: rand(HAND_GESTURES),
+    expression: rand(FACIAL_EXPRESSIONS),
+    lighting: rand(LIGHTING)
+  };
+  count++;
+  updateCount();
+  renderFields();
+  localStorage.setItem('fa_last', JSON.stringify(current));
+}
+
+function reroll(field) {
+  if (field === 'framing') {
+    const key = selectedFrameKey === 'random' ? rand(Object.keys(FRAMING)) : selectedFrameKey;
+    current.framing = FRAMING[key];
+  } else if (field === 'pose') current.pose = rand(BODY_POSES);
+  else if (field === 'gesture') current.gesture = rand(HAND_GESTURES);
+  else if (field === 'expression') current.expression = rand(FACIAL_EXPRESSIONS);
+  else if (field === 'lighting') current.lighting = rand(LIGHTING);
+  
+  renderFields();
+  localStorage.setItem('fa_last', JSON.stringify(current));
+}
+
+// --- EVENT LISTENERS ---
+document.querySelectorAll('#framingSelector .selector-btn').forEach(btn => {
+  btn.onclick = () => setActiveFrame(btn.dataset.frame);
+});
+
+$('generateBtn').onclick = generateAll;
+
+$('copyBtn').onclick = async () => {
+  try {
+    await navigator.clipboard.writeText($('prompt').value);
+    $('copyBtn').textContent = "Copied ✓";
+    $('copyBtn').classList.add('copied');
+    setTimeout(() => {
+      $('copyBtn').textContent = "Copy Prompt";
+      $('copyBtn').classList.remove('copied');
+    }, 1500);
+  } catch (err) {}
 };
 
-const BODY_POSES = [ /* 52種に大幅増加 */ 
-  "standing naturally with weight on one leg", "walking gracefully toward camera", "leaning casually against a wall",
-  "sitting on steps looking sideways", "standing with hands in pockets", "turning around while walking",
-  "sitting on the floor with knees up", "standing with arms crossed loosely", "mid-stride dynamic walking pose",
-  "relaxed standing pose, looking over shoulder", "leaning forward slightly with interest", "standing tall and confident",
-  "sitting on a chair backwards", "crouching down gently", "lying on side propped on elbow",
-  "standing with one hand on hip", "walking away from camera", "sitting with legs crossed elegantly",
-  "standing with slight contrapposto pose", "kneeling on one knee", "jumping in mid-air", "running dynamically",
-  "dancing freely", "spinning around", "balancing on one foot", "stretching arms upward", "hugging own body gently",
-  "bending forward slightly", "squatting playfully", "reclining on elbow", "standing with legs crossed",
-  "posing with hand on waist", "walking with confident stride", "sitting with one leg up", "leaning back relaxed",
-  "crouching with hands on knees", "standing with arms open wide", "twirling with scarf flowing",
-  "posing dramatically with hand on chest", "casual hands behind head", "sitting on edge of something",
-  "standing in contrapposto with hand on hip", "gentle sway while standing", "looking back over shoulder while walking"
-];
-
-const HAND_GESTURES = [ /* 48種に大幅増加 */ 
-  "hand gently touching hair", "fingers running through hair", "one hand resting on cheek",
-  "hand on hip, confident pose", "both hands in pockets casually", "touching neck softly",
-  "fingers playing with collar or necklace", "hand raised near face thoughtfully", "arms crossed loosely",
-  "hand resting on collarbone", "fingers touching lips", "one hand holding the other arm",
-  "hand brushing hair behind ear", "fingers tracing jawline", "hand placed on chest emotionally",
-  "both hands holding a cup or object", "casual peace sign", "hand making a small wave",
-  "fingers interlaced in front", "one hand touching the back of neck", "hand resting on thigh while sitting",
-  "fingers drumming lightly", "hand covering mouth gently", "pointing softly with index finger",
-  "hand adjusting sleeve or cuff", "fingers touching ear", "hand on forehead in thought",
-  "both hands on hips", "one hand touching shoulder", "fingers making heart shape",
-  "hand gently holding chin", "arms raised above head", "hand waving goodbye",
-  "fingers snapping", "hand resting on stomach", "one hand behind head",
-  "fingers counting something", "hand making okay sign", "both hands covering face shyly",
-  "hand touching lips seductively", "fingers tracing collarbone", "hand grabbing strap of bag",
-  "one hand in hair, other on hip", "hands clasped together in front", "hand touching opposite elbow",
-  "fingers playing with earring", "hand resting lightly on chest", "fingers gently touching lips while thinking"
-];
-
-const FACIAL_EXPRESSIONS = [ /* 40種（前回と同じ） */ 
-  "soft gentle smile, eyes slightly narrowed", /* ... 省略 ... */ "cool indifferent expression"
-];
-
-const LIGHTING = [ /* 18種（前回と同じ） */ ];
-
-function generate() {
-  generated++;
-  document.getElementById("counter").textContent = `${generated} generated`;
-
-  const framingSelect = document.getElementById("framing").value;
-  const framing = framingSelect ? FRAMING[framingSelect] : pick(Object.values(FRAMING));
-  
-  const pose = pick(BODY_POSES);
-  const gesture = pick(HAND_GESTURES);
-  const expression = pick(FACIAL_EXPRESSIONS);
-  const lighting = pick(LIGHTING);
-
-  const prompt = `${framing}, ${pose}, ${gesture}, ${expression}, ${lighting}, cinematic photography, high detail, filmic, natural movement`;
-
-  document.getElementById("result").innerHTML = `
-    <strong>生成プロンプト</strong><br><br>
-    <div style="background:#1a1a1a;padding:18px;border-radius:8px;font-size:13.5px;line-height:1.65;white-space:pre-wrap">${prompt}</div>
-    <button onclick="navigator.clipboard.writeText('${prompt}')" style="margin-top:12px">コピー</button>
-  `;
-  document.getElementById("result").style.display = "block";
+// --- INITIALIZE ---
+const last = localStorage.getItem('fa_last');
+if (last) {
+  current = JSON.parse(last);
+  renderFields();
+  $('count').textContent = `${count} generated`;
+} else {
+  generateAll();
 }
+
+document.addEventListener('keydown', e => {
+  if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') generateAll();
+});
 </script>
 </body>
 </html>
